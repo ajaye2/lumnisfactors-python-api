@@ -34,6 +34,10 @@ class LumnisFactors:
         url = self.API_BASE + PARAMS
         res = requests.get(url, headers=self.HEADERS)
 
+        if res.status_code != 200:   
+            raise Exception('Api call failed. Make sure you have passed in a valid API Key and the right parameters.')
+
+
         data_api = pd.DataFrame(json.loads(res.json()['data']))
         data_api.index = data_api.index.astype(np.int64)
         data_api.index = self.convert_from_unix_to_datetime(data_api.index)
@@ -105,6 +109,9 @@ class LumnisFactors:
                 print("One API call failed; no status code returned", "url: ", urls[i])
             else:
                 res_items.append(res)
+        
+        if len(res_items) == 0:
+            raise Exception('None of the api calls succeeded. Make sure you have passed in a valid API Key and the right parameters.')
 
         api_data_list = [pd.DataFrame(json.loads(x.json()['data'])) for x in res_items]
         data_api = pd.concat(api_data_list, axis=0)
