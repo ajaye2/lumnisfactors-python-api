@@ -12,7 +12,7 @@ setuptools.setup(
     description="Lumnis Alternative Data",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/lumnisfactors/lumnisfactors-python-api",
+    url="https://github.com/lumnisfactors/lumnisfactors-python-api/archive/refs/tags/v0.3.tar.gz",
     py_modules = ["lumnis"],
     install_requires=[
         'grequests',
