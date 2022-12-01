@@ -70,7 +70,7 @@ class LumnisFactors:
 
         return data_api
 
-    def get_multi_date_data_parallel(self, factor_name: str, exchange: str, asset: str, time_frame: str,
+    def get_historical_data(self, factor_name: str, exchange: str, asset: str, time_frame: str,
                                      start_date: str, end_date: str):
         """
         Gets data for defined parameters over a date range in paralle with grequests. Returns pd DF of data.
@@ -95,13 +95,16 @@ class LumnisFactors:
         urls = [get_lumnis_url(factor_name, exchange, asset, time_frame, x) for x in date_range_for_urls]
 
         rs = (grequests.get(u, headers=self.HEADERS) for u in urls)
-        res_items = grequests.map(rs, exception_handler=exception_handler)
+        res_items_ret = grequests.map(rs, exception_handler=exception_handler)
+        res_items = []
 
-        for res in res_items:
+        for i, res in enumerate( res_items ):
             if res is not None and res.status_code != 200:
-                print("One API call failed with status code", res.status_code)
-            if res is None:
-                print("One API call failed; no status code returned")
+                print("One API call failed with status code", res.status_code, "url: ", urls[i])
+            elif res is None:
+                print("One API call failed; no status code returned", "url: ", urls[i])
+            else:
+                res_items.append(res)
 
         api_data_list = [pd.DataFrame(json.loads(x.json()['data'])) for x in res_items]
         data_api = pd.concat(api_data_list, axis=0)
