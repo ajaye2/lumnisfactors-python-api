@@ -98,7 +98,7 @@ class LumnisFactors:
         res_items_ret = grequests.map(rs, exception_handler=exception_handler)
         res_items = []
 
-        for i, res in enumerate( res_items ):
+        for i, res in enumerate( res_items_ret ):
             if res is not None and res.status_code != 200:
                 print("One API call failed with status code", res.status_code, "url: ", urls[i])
             elif res is None:
