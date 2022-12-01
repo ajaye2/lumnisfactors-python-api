@@ -11,6 +11,8 @@ The LUMNIS Crypto API provides the most comprehensive factor dataset for crypto 
 
 This data can be used for backtesting and implementing trading strategies.
 
+### Documentation
+Click [here](https://docs.lumnis.io) to view documentation on API usage.
 
 ### Receiving API Token
 You can sign up [here](https://docs.lumnis.io) to retreive a lumnis API Key 
