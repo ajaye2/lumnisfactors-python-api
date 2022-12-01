@@ -17,7 +17,6 @@ setuptools.setup(
         'grequests',
         'pandas',
         'requests',
-        'json', 
         'numpy'
 ],
     classifiers=[
