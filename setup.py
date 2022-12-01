@@ -5,7 +5,8 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="lumnisfactors",
-    version="0.2",
+    packages = ['lumnisfactors'],
+    version="0.3",
     author="Abubakarr Jaye",
     author_email="ajaye@lumnis.org",
     description="Lumnis Alternative Data",
