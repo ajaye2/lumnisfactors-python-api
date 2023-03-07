@@ -12,7 +12,7 @@ import datetime
 class LumnisFactors:
     def __init__(self, api_key):
         self.KEY = api_key #os.environ['LUMNIS']
-        self.API_BASE = "https://api.lumnis.io/beta"
+        self.API_BASE = "https://api.lumnis.io/v1"
         self.HEADERS = {
             "x-api-key": self.KEY
         }
@@ -29,18 +29,18 @@ class LumnisFactors:
         Gets data for defined parameters for only one date. Returns pd DF of data.
         See docs.lumnis.io (docs) for values each of the parameters can take.
         """
-        PARAMS = "/getfactor?factorName=%s&exchange=%s&asset=%s&timeFrame=%s&date=%s" % (
+        PARAMS = "/historical?factorName=%s&exchange=%s&asset=%s&timeFrame=%s&date=%s" % (
             factor_name, exchange, asset, time_frame, date)
         url = self.API_BASE + PARAMS
         res = requests.get(url, headers=self.HEADERS)
 
-        if res.status_code != 200:   
-            raise Exception('Api call failed. Make sure you have passed in a valid API Key and the right parameters.')
+        if res.status_code != 200:  
+            raise Exception('Api call failed. Make sure you have passed in a valid API Key and the right parameters.', res.status_code, res.json() )
 
 
         data_api = pd.DataFrame(json.loads(res.json()['data']))
-        data_api.index = data_api.index.astype(np.int64)
-        data_api.index = self.convert_from_unix_to_datetime(data_api.index)
+        # data_api.index = data_api.index.astype(np.int64)
+        # data_api.index = self.convert_from_unix_to_datetime(data_api.index)
         data_api.drop_duplicates(inplace=True)
 
         return data_api
@@ -58,7 +58,7 @@ class LumnisFactors:
         while curr_date <= END_DATE:
             try:
                 date = curr_date.strftime('%Y-%m-%d')
-                PARAMS = "/getfactor?factorName=%s&exchange=%s&asset=%s&timeFrame=%s&date=%s" % (
+                PARAMS = "/historical?factorName=%s&exchange=%s&asset=%s&timeFrame=%s&date=%s" % (
                     factor_name, exchange, asset, time_frame, date)
                 res = requests.get(self.API_BASE + PARAMS, headers=self.HEADERS)
                 api_data_list.append(pd.DataFrame(json.loads(res.json()['data'])))
@@ -68,8 +68,8 @@ class LumnisFactors:
                 curr_date += pd.Timedelta(days=1)
 
         data_api = pd.concat(api_data_list, axis=0)
-        data_api.index = data_api.index.astype(np.int64)
-        data_api.index = self.convert_from_unix_to_datetime(data_api.index)
+        # data_api.index = data_api.index.astype(np.int64)
+        # data_api.index = self.convert_from_unix_to_datetime(data_api.index)
         data_api.drop_duplicates(inplace=True)
 
         return data_api
@@ -88,7 +88,7 @@ class LumnisFactors:
 
         def get_lumnis_url(factor, exch, coinpair, timespan, date):
             date = date.strftime('%Y-%m-%d')
-            PARAMS = "/getfactor?factorName=%s&exchange=%s&asset=%s&timeFrame=%s&date=%s" % (
+            PARAMS = "/historical?factorName=%s&exchange=%s&asset=%s&timeFrame=%s&date=%s" % (
                 factor, exch, coinpair, timespan, date)
             return self.API_BASE + PARAMS
 
@@ -104,7 +104,7 @@ class LumnisFactors:
 
         for i, res in enumerate( res_items_ret ):
             if res is not None and res.status_code != 200:
-                print("One API call failed with status code", res.status_code, "url: ", urls[i])
+                print("One API call failed with status code", res.status_code, "url: ", urls[i], "response: ", res.json()) 
             elif res is None:
                 print("One API call failed; no status code returned", "url: ", urls[i])
             else:
@@ -115,8 +115,8 @@ class LumnisFactors:
 
         api_data_list = [pd.DataFrame(json.loads(x.json()['data'])) for x in res_items]
         data_api = pd.concat(api_data_list, axis=0)
-        data_api.index = data_api.index.astype(np.int64)
-        data_api.index = self.convert_from_unix_to_datetime(data_api.index)
+        # data_api.index = data_api.index.astype(np.int64)
+        # data_api.index = self.convert_from_unix_to_datetime(data_api.index)
         data_api.drop_duplicates(inplace=True)
 
         return data_api
