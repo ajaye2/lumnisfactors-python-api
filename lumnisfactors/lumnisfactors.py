@@ -120,3 +120,24 @@ class LumnisFactors:
         data_api.drop_duplicates(inplace=True)
 
         return data_api
+    
+    def get_live_data(self, factor_name: str, exchange: str, asset: str, time_frame: str, offset: int = 100):
+        """
+        Gets live data for defined parameters. Returns pd DF of data.
+        See docs.lumnis.io (docs) for values each of the parameters can take.
+        """
+
+        PARAMS = "/live?factorName=%s&exchange=%s&asset=%s&timeFrame=%s&offset=%s" % (
+        factor_name, exchange, asset, time_frame, offset)
+
+        url = self.API_BASE + PARAMS
+        res = requests.get(url, headers=self.HEADERS)
+
+        if res.status_code != 200:  
+            raise Exception('Api call failed. Make sure you have passed in a valid API Key and the right parameters.', res.status_code, res.json() )
+
+
+        data_api = pd.DataFrame(json.loads(res.json()['data']))
+        data_api.drop_duplicates(inplace=True)
+        return data_api
+        
