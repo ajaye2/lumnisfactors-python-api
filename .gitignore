@@ -6,6 +6,9 @@ __pycache__/
 # C extensions
 *.so
 
+lumnisfactors/KEYS.py
+lumnisfactors/test.ipynb
+
 test.ipynb
 
 # Distribution / packaging
