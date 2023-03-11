@@ -141,3 +141,37 @@ class LumnisFactors:
         data_api.drop_duplicates(inplace=True)
         return data_api
         
+    def get_multifactor_live_data(self, factor_names: list, exchange: str, asset: str, time_frame: str, offset: int = 100):
+        """
+        Gets live data for defined parameters. Returns pd DF of data.
+        See docs.lumnis.io (docs) for values each of the parameters can take.
+        """
+        urls = []
+        for factor_name in factor_names:
+            PARAMS = "/live?factorName=%s&exchange=%s&asset=%s&timeFrame=%s&offset=%s" % (
+            factor_name, exchange, asset, time_frame, offset)
+            url = self.API_BASE + PARAMS
+            urls.append(url)
+
+        def exception_handler(request, exception):
+            print(exception)
+
+        rs = (grequests.get(u, headers=self.HEADERS) for u in urls)
+        res_items_ret = grequests.map(rs, exception_handler=exception_handler)
+        res_items = []
+
+        for i, res in enumerate( res_items_ret ):
+            if res is not None and res.status_code != 200:
+                print("One API call failed with status code", res.status_code, "url: ", urls[i], "response: ", res.json()) 
+            elif res is None:
+                print("One API call failed; no status code returned", "url: ", urls[i])
+            else:
+                res_items.append(res)
+        
+        if len(res_items) == 0:
+            raise Exception('None of the api calls succeeded. Make sure you have passed in a valid API Key and the right parameters.')
+
+        api_data_list = [pd.DataFrame(json.loads(x.json()['data'])) for x in res_items]
+        data_api = pd.concat(api_data_list, axis=1)
+        data_api.drop_duplicates(inplace=True)
+        return data_api
